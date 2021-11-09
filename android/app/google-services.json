@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "836140943337",
+    "project_id": "architecturestudy-e9613",
+    "storage_bucket": "architecturestudy-e9613.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836140943337:android:82e0b4df83e1d196a5ed78",
+        "android_client_info": {
+          "package_name": "com.example.architecture_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836140943337-c60l2r0ogi4it4ueqk1osbkik5mcu36j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5FGeqxYMJndJTLhyWP-9ZbQuFP756LD4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836140943337-c60l2r0ogi4it4ueqk1osbkik5mcu36j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
