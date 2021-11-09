@@ -9,6 +9,7 @@ class ExampleModel {
       {required this.id, required this.contents, required this.subContentList});
 
   //! fromJson이라면 서버에서 이미 처리 다한 json만 읽으면 된다. (깔끔하다.)
+  //! 현재는 restAPI처럼 내부 map형식으로 firebase를 만들어놔서 fromJson으로 읽을 수 있다.
   factory ExampleModel.fromJson(Map<String, dynamic> json) {
     //json 중첩 구조를 subModel로 빼기 위한 로직
     List<Map<String, dynamic>> contentJsonList =
