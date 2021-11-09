@@ -1,3 +1,4 @@
+import 'package:architecture_project/bindings/example_bindings.dart';
 import 'package:get/get.dart';
 
 import 'page/example_page.dart';
@@ -11,6 +12,7 @@ class PageRouter {
     GetPage(
       name: ExamplePage.routeName,
       page: () => const ExamplePage(),
+      binding: ExampleBindings(),
     ),
   ];
 }
