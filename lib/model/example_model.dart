@@ -37,7 +37,9 @@ class ExampleModel {
         json['sub_content_list']?.cast<Map<String, dynamic>>().toList();
 
     return ExampleModel(
-        id: json['id'],
+        //? firebase에서 각 document마다 고유한 id값이 있음, 이 아이디는 DocumentSnapshot에서 id로 접근 가능.
+        // id: json['id'], => 디비에 넣어놨기 때문에 이렇게 해도 문제 없으나 DocumentSnapshot id를 보여주기 위해 아래처럼 코딩
+        id: doc.id,
         contents: json['contents'],
         //! 만약 subContentList가 내부 컬랙션이였으면 ?
         //! doc.reference.collection('sub_collection').get(); =>한걸 list화 해서 넣어주어야 한다.
