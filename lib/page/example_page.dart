@@ -40,7 +40,11 @@ class _ExamplePageState extends State<ExamplePage> {
           }
 
           if (state is Error) {
-            return const Text("Error!");
+            return TextButton(
+                onPressed: () {
+                  _exampleViewModel.getExampleList();
+                },
+                child: const Text("Error Retry!"));
           }
 
           if (state is Loading) {
@@ -50,7 +54,8 @@ class _ExamplePageState extends State<ExamplePage> {
           return ListView.builder(
             itemBuilder: (_, index) {
               return ListTile(
-                title: Text(_exampleViewModel.exampleList[index].contents),
+                title: Text(
+                    _exampleViewModel.exampleList[index].toJson().toString()),
               );
             },
             itemCount: _exampleViewModel.exampleList.length,
