@@ -15,7 +15,7 @@ class ExampleRepository {
       {required String id}) async {
     try {
       DocumentSnapshot snapshot =
-          await _firestore.collection('example').doc(id).get();
+          await _firestore.collection('note_b').doc(id).get();
 
       //! Model에서 만든 factory함수 활용
       ExampleModel result = ExampleModel.fromFirebase(snapshot);
@@ -24,14 +24,14 @@ class ExampleRepository {
       return Right(result);
     } catch (e) {
       //! Left는 실패한 케이스 결과값이다.
-      return Left(Failure());
+      return Left(Failure(e.toString()));
     }
   }
 
   Future<Either<Failure, List<ExampleModel>>> getAllExampleModel() async {
     try {
       //! 여러개 데이터 가져온 경우
-      QuerySnapshot snapshot = await _firestore.collection('example').get();
+      QuerySnapshot snapshot = await _firestore.collection('note_b').get();
 
       //! QuerySnapshot의 docs의 여러 문서를 map돌면서 Model화
       List<ExampleModel> result =
@@ -41,7 +41,7 @@ class ExampleRepository {
       return Right(result);
     } catch (e) {
       //! Left는 실패한 케이스 결과값이다.
-      return Left(Failure());
+      return Left(Failure(e.toString()));
     }
   }
 }

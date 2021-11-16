@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ExampleModel {
   final String id;
-  final String contents;
-  final List<ExampleSubModel> subContentList;
+  final String content;
+  // final List<ExampleSubModel> subContentList;
   final DateTime createdAt;
+  final String title;
+  final bool isFavorited;
 
   ExampleModel(
-      {required this.id,
-      required this.contents,
-      required this.subContentList,
+      {required this.title,
+      required this.isFavorited,
+      required this.id,
+      required this.content,
+      // required this.subContentList,
       required this.createdAt});
 
   //! fromJson이라면 서버에서 이미 처리 다한 json만 읽으면 된다. (깔끔하다.)
@@ -33,29 +37,33 @@ class ExampleModel {
     //! 그러나 firestore에서 읽어오면 dart에서는 list<Map>이 아니라 list<dynamic>으로 인식해버림
     //! dynamic을 Map으로 쓰려고 하면 에러가 발생
     //! 그래서 아래와 같이 cast를 통해 내용물들을 Map<String, dynamic>으로 바꿔준 뒤 toList로 list화 시킴.
-    List<Map<String, dynamic>> contentJsonList =
-        json['sub_content_list']?.cast<Map<String, dynamic>>().toList();
+    // List<Map<String, dynamic>> contentJsonList =
+    //     json['sub_content_list']?.cast<Map<String, dynamic>>().toList();
 
     return ExampleModel(
         //? firebase에서 각 document마다 고유한 id값이 있음, 이 아이디는 DocumentSnapshot에서 id로 접근 가능.
         // id: json['id'], => 디비에 넣어놨기 때문에 이렇게 해도 문제 없으나 DocumentSnapshot id를 보여주기 위해 아래처럼 코딩
         id: doc.id,
-        contents: json['contents'],
+        content: json['content'],
+        createdAt: (json['created_at'] as Timestamp).toDate(),
+        title: json['title'],
         //! 만약 subContentList가 내부 컬랙션이였으면 ?
         //! doc.reference.collection('sub_collection').get(); =>한걸 list화 해서 넣어주어야 한다.
-        subContentList:
-            contentJsonList.map((e) => ExampleSubModel.fromJson(e)).toList(),
-        createdAt: (json['created_at'] as Timestamp).toDate());
+        // subContentList:
+        //     contentJsonList.map((e) => ExampleSubModel.fromJson(e)).toList(),
+        isFavorited: json['is_favorited']);
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'contents': contents,
+      'content': content,
       //! 일반적인 restapi라면 아래와 같이 해서 보내주면 된다.
       //! 하지만 firestore는 서브컬랙션이냐에 따라서 로직이 복잡해진다.
-      'sub_content_list': subContentList.map((e) => e.toJson()).toList(),
+      // 'sub_content_list': subContentList.map((e) => e.toJson()).toList(),
       'created_at': createdAt,
+      'title': title,
+      'is_favorited': isFavorited
     };
   }
 }
@@ -73,7 +81,7 @@ class ExampleSubModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'contents': contents,
+      'content': contents,
     };
   }
 }
