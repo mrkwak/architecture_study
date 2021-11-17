@@ -1,5 +1,6 @@
 import 'package:architecture_project/core/view_state.dart';
 import 'package:architecture_project/page/example_detail_page.dart';
+import 'package:architecture_project/page/example_write_page.dart';
 import 'package:architecture_project/page/widget/tile_widget.dart';
 import 'package:architecture_project/viewmodel/example_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // bottomNavigationBar: AppBar(),
       body: Center(
         child: Obx(() {
           //viewmodel의 viewstate가져오기 => !붙인 이유는 nullable을 non-nullable로 풀어주려고
@@ -34,11 +36,20 @@ class _ExamplePageState extends State<ExamplePage> {
           ViewState state = _exampleViewModel.viewState!;
 
           if (state is Initial) {
-            return TextButton(
-                onPressed: () {
-                  _exampleViewModel.getExampleList();
-                },
-                child: const Text("데이터 가져오기"));
+            return Row(
+              children: [
+                TextButton(
+                    onPressed: () {
+                      _exampleViewModel.getExampleList();
+                    },
+                    child: const Text("데이터 가져오기")),
+                TextButton(
+                    onPressed: () {
+                      Get.toNamed(ExampleWritePage.routeName);
+                    },
+                    child: const Text("글쓰기")),
+              ],
+            );
           }
 
           if (state is Error) {

@@ -1,5 +1,6 @@
 import 'package:architecture_project/bindings/example_bindings.dart';
 import 'package:architecture_project/page/example_detail_page.dart';
+import 'package:architecture_project/page/example_write_page.dart';
 import 'package:get/get.dart';
 
 import 'page/example_page.dart';
@@ -18,6 +19,11 @@ class PageRouter {
     GetPage(
       name: ExampleDetailPage.routeName,
       page: () => ExampleDetailPage(),
+      binding: ExampleBindings(),
+    ),
+    GetPage(
+      name: ExampleWritePage.routeName,
+      page: () => ExampleWritePage(),
       binding: ExampleBindings(),
     ),
   ];
