@@ -44,4 +44,30 @@ class ExampleRepository {
       return Left(Failure(e.toString()));
     }
   }
+
+  Future<Either<Failure, bool>> addExampleModel(
+      {required ExampleModel exampleModel}) async {
+    CollectionReference _firestore =
+        FirebaseFirestore.instance.collection('note_b');
+
+    try {
+      print(exampleModel);
+      _firestore
+          .add({exampleModel})
+          .then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error"));
+
+      // DocumentReference reference = _firestore.collection('note_b').add();
+
+      // await _firestore.collection('note_b').doc().set(exampleModel.toJson());
+
+//  .collection('note_b')( {'sender': 'sss', 'text': '123123'} );
+
+      //! 성공 케이스
+      return const Right(true);
+    } catch (e) {
+      //! Left는 실패한 케이스 결과값이다.
+      return Left(Failure(e.toString()));
+    }
+  }
 }

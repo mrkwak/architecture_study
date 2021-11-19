@@ -1,4 +1,5 @@
 import 'package:architecture_project/page/example_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -8,54 +9,81 @@ class ExampleWritePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final textFieldController = TextEditingController();
   final Map<String, String> result = {};
+  final CollectionReference noteB =
+      FirebaseFirestore.instance.collection('note_b');
 
   ExampleWritePage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFeildWithTitleWidget(
-              title: '제목',
-              textFieldController: textFieldController,
-              label: '',
-              onSaved: (_value) {
-                result['title'] = _value.toString();
-              },
-              validator: (value) {},
-            ),
-            TextFeildWithTitleWidget(
-              title: '내용',
-              textFieldController: textFieldController,
-              label: '',
-              onSaved: (_value) {
-                result['content'] = _value.toString();
-              },
-              validator: (value) {},
-            ),
-            TextButton(
-              onPressed: () async {
-                //!TODO : validate 추가 물리백키 이슈 확인
-                // if(formKey.currentState!.validate()){
-                // validation 이 성공하면 true 가 리턴돼요!
-                Get.offNamed(
-                  ExamplePage.routeName,
-                );
-                Get.snackbar(
-                  '저장완료!',
-                  '폼 저장이 완료되었습니다!',
-                  backgroundColor: Colors.white,
-                );
-                _formKey.currentState!.save();
-                // }
-              },
-              child: const Text(
-                '저장하기!',
+    Future<void> addNoteB() {
+      return noteB.add({
+        'title': result['title'],
+        'content': result['content'],
+        'created_at': Timestamp.fromDate(DateTime.now()),
+        'is_favorited': false,
+      });
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFeildWithTitleWidget(
+                title: '제목',
+                textFieldController: textFieldController,
+                label: '',
+                onSaved: (_value) {
+                  result['title'] = _value.toString();
+                },
+                validator: (value) {},
               ),
-            ),
-          ],
+              TextFeildWithTitleWidget(
+                title: '내용',
+                textFieldController: textFieldController,
+                label: '',
+                onSaved: (_value) {
+                  result['content'] = _value.toString();
+                },
+                validator: (value) {},
+              ),
+              TextButton(
+                onPressed: () async {
+                  //!TODO : validate 추가 물리백키 이슈 확인
+                  // if(formKey.currentState!.validate()){
+                  // validation 이 성공하면 true 가 리턴돼요!
+                  if (result.isNotEmpty) {
+                    Get.offNamed(
+                      ExamplePage.routeName,
+                    );
+                    _formKey.currentState!.save();
+
+                    addNoteB();
+
+                    Get.snackbar(
+                      '저장완료!',
+                      '폼 저장이 완료되었습니다!',
+                      backgroundColor: Colors.white,
+                    );
+                    return;
+                  } else {
+                    Get.snackbar(
+                      '저장실패!',
+                      '내용을 입력해주세요!',
+                      backgroundColor: Colors.white,
+                    );
+                    return;
+                  }
+
+                  // }
+                },
+                child: const Text(
+                  '저장하기!',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
