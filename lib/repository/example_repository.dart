@@ -45,28 +45,54 @@ class ExampleRepository {
     }
   }
 
-  Future<Either<Failure, bool>> addExampleModel(
-      {required ExampleModel exampleModel}) async {
-    CollectionReference _firestore =
-        FirebaseFirestore.instance.collection('note_b');
-
+  Future<Either<Failure, List<ExampleModel>>>
+      getExampleModelByIsFavorited() async {
     try {
-      print(exampleModel);
-      _firestore
-          .add({exampleModel})
-          .then((value) => print("User Added"))
-          .catchError((error) => print("Failed to add user: $error"));
+      QuerySnapshot snapshot = await _firestore
+          .collection('note_b')
+          .where('is_favorited', isEqualTo: true)
+          .get();
 
-      // DocumentReference reference = _firestore.collection('note_b').add();
-
-      // await _firestore.collection('note_b').doc().set(exampleModel.toJson());
-
-//  .collection('note_b')( {'sender': 'sss', 'text': '123123'} );
+      List<ExampleModel> result =
+          snapshot.docs.map((e) => ExampleModel.fromFirebase(e)).toList();
 
       //! 성공 케이스
-      return const Right(true);
+      return Right(result);
     } catch (e) {
       //! Left는 실패한 케이스 결과값이다.
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, void>> toggleFavorite(
+      {required ExampleModel updatedModel}) async {
+    try {
+      await _firestore
+          .collection('note_b')
+          .doc(updatedModel.id)
+          .update(updatedModel.toJson());
+
+      return const Right(null);
+    } catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, void>> setNoteBDoc(
+      {required ExampleModel setModel}) async {
+    DocumentReference doc = _firestore.collection("note_b").doc();
+
+    try {
+      await doc.set({
+        'id': doc.id,
+        'title': setModel.title,
+        'content': setModel.content,
+        'created_at': Timestamp.fromDate(DateTime.now()),
+        'is_favorited': false,
+      });
+
+      return const Right(null);
+    } catch (e) {
       return Left(Failure(e.toString()));
     }
   }

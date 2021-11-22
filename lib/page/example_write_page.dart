@@ -1,31 +1,25 @@
+import 'package:architecture_project/model/example_model.dart';
 import 'package:architecture_project/page/example_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:architecture_project/viewmodel/example_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 class ExampleWritePage extends StatelessWidget {
   static const routeName = "/WritePage";
   final _formKey = GlobalKey<FormState>();
   final textFieldController = TextEditingController();
-  final Map<String, String> result = {};
-  final CollectionReference noteB =
-      FirebaseFirestore.instance.collection('note_b');
+  final Map<String, String> writeData = {};
+
+  late ExampleViewModel _exampleViewModel;
 
   ExampleWritePage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    Future<void> addNoteB() {
-      return noteB.add({
-        'title': result['title'],
-        'content': result['content'],
-        'created_at': Timestamp.fromDate(DateTime.now()),
-        'is_favorited': false,
-      });
-    }
-
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('글쓰기'),
+        ),
         body: Form(
           key: _formKey,
           child: Column(
@@ -35,7 +29,7 @@ class ExampleWritePage extends StatelessWidget {
                 textFieldController: textFieldController,
                 label: '',
                 onSaved: (_value) {
-                  result['title'] = _value.toString();
+                  writeData['title'] = _value.toString();
                 },
                 validator: (value) {},
               ),
@@ -44,7 +38,7 @@ class ExampleWritePage extends StatelessWidget {
                 textFieldController: textFieldController,
                 label: '',
                 onSaved: (_value) {
-                  result['content'] = _value.toString();
+                  writeData['content'] = _value.toString();
                 },
                 validator: (value) {},
               ),
@@ -53,13 +47,16 @@ class ExampleWritePage extends StatelessWidget {
                   //!TODO : validate 추가 물리백키 이슈 확인
                   // if(formKey.currentState!.validate()){
                   // validation 이 성공하면 true 가 리턴돼요!
-                  if (result.isNotEmpty) {
-                    Get.offNamed(
-                      ExamplePage.routeName,
-                    );
-                    _formKey.currentState!.save();
+                  //! 함수화
+                  _formKey.currentState!.save();
+                  if (writeData.isNotEmpty) {
+                    //! model에 새로운거 어떻게 추가하는지???
 
-                    addNoteB();
+                    _exampleViewModel.setNoteBDoc(
+                        title: writeData['title'].toString(),
+                        content: writeData['content'].toString());
+                    // AddNoteB().addNoteBDoc(writeData: writeData);
+                    Get.back();
 
                     Get.snackbar(
                       '저장완료!',

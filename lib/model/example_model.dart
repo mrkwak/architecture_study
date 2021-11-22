@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ExampleModel {
-  final String id;
+  String? id;
   final String content;
   // final List<ExampleSubModel> subContentList;
   final DateTime createdAt;
   final String title;
-  final bool isFavorited;
+  bool isFavorited;
 
   ExampleModel(
       {required this.title,
       required this.isFavorited,
-      required this.id,
+      this.id,
       required this.content,
       // required this.subContentList,
       required this.createdAt});
@@ -85,3 +85,40 @@ class ExampleSubModel {
     };
   }
 }
+
+// class UpdateNoteB {
+//   Future<void> updateNoteB(
+//       {required List<ExampleModel> originalData,
+//       required Map<String, dynamic> updateData,
+//       required String contentId}) {
+//     DocumentReference ref =
+//         FirebaseFirestore.instance.collection("note_b").doc(contentId);
+//     String updateTitle = updateData['title'] !=
+//             originalData.firstWhere((element) => element.id == contentId).title
+//         ? updateData['title']
+//         : originalData.firstWhere((element) => element.id == contentId).title;
+//     String updateContent = updateData['content'] !=
+//             originalData
+//                 .firstWhere((element) => element.id == contentId)
+//                 .content
+//         ? updateData['content']
+//         : originalData.firstWhere((element) => element.id == contentId).content;
+//     bool updateIsFavorited = updateData['isFavorited'] !=
+//             originalData
+//                 .firstWhere((element) => element.id == contentId)
+//                 .isFavorited
+//         ? updateData['isFavorited']
+//         : originalData
+//             .firstWhere((element) => element.id == contentId)
+//             .isFavorited;
+//     try {
+//       return ref.update({
+//         'title': updateTitle,
+//         'content': updateContent,
+//         'is_favorited': updateIsFavorited,
+//       });
+//     } catch (e) {
+//       return throw Exception('error');
+//     }
+//   }
+// }

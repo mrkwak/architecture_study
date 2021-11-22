@@ -27,7 +27,32 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: AppBar(),
+      appBar: AppBar(title: const Text('메인화면'), actions: [
+        IconButton(
+            onPressed: () {
+              _exampleViewModel.getExampleListByIsFavorited();
+            },
+            icon: const Icon(Icons.favorite))
+      ]),
+      bottomNavigationBar: Row(
+        children: [
+          Expanded(
+            child: TextButton(
+                onPressed: () {
+                  _exampleViewModel.getExampleList();
+                },
+                child: const Text("글 가져오기")),
+          ),
+          Expanded(
+            child: TextButton(
+                onPressed: () {
+                  // Get.offNamed로 글쓰기 페이지에서 글 목록 페이지로 오면 뒤로가기하면 글쓰기 화면이 여러번됨 (종료버튼으로 변경예정)
+                  Get.toNamed(ExampleWritePage.routeName);
+                },
+                child: const Text("글쓰기")),
+          ),
+        ],
+      ),
       body: Center(
         child: Obx(() {
           //viewmodel의 viewstate가져오기 => !붙인 이유는 nullable을 non-nullable로 풀어주려고
@@ -36,19 +61,8 @@ class _ExamplePageState extends State<ExamplePage> {
           ViewState state = _exampleViewModel.viewState!;
 
           if (state is Initial) {
-            return Row(
-              children: [
-                TextButton(
-                    onPressed: () {
-                      _exampleViewModel.getExampleList();
-                    },
-                    child: const Text("데이터 가져오기")),
-                TextButton(
-                    onPressed: () {
-                      Get.toNamed(ExampleWritePage.routeName);
-                    },
-                    child: const Text("글쓰기")),
-              ],
+            return const Center(
+              child: Text('없다 글이 아직.'),
             );
           }
 
@@ -95,9 +109,10 @@ class _ExamplePageState extends State<ExamplePage> {
                           .toString(),
                       onPressed: () => Get.toNamed(
                         ExampleDetailPage.routeName,
-                        parameters: {
-                          'id': _exampleViewModel.exampleList[index].id
-                        },
+                        arguments: _exampleViewModel.exampleList[index],
+                        // parameters: {
+                        //   'model': _exampleViewModel.exampleList[index],
+                        // },
                       ),
                     );
                   },
