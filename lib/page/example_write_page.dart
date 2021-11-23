@@ -1,5 +1,4 @@
-import 'package:architecture_project/model/example_model.dart';
-import 'package:architecture_project/page/example_page.dart';
+import 'package:architecture_project/page/widget/text_feild_with_title_widget.dart';
 import 'package:architecture_project/viewmodel/example_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +9,41 @@ class ExampleWritePage extends StatelessWidget {
   final textFieldController = TextEditingController();
   final Map<String, String> writeData = {};
 
-  late ExampleViewModel _exampleViewModel;
+  final _exampleViewModel = Get.find<ExampleViewModel>();
+  // late final ExampleViewModel _exampleViewModel;
+
+  void fncSetNoteBDoc() {
+    if (writeData.isNotEmpty) {
+      _formKey.currentState!.save();
+      bool result = _exampleViewModel.setNoteBDoc(
+          title: writeData['title'].toString(),
+          content: writeData['content'].toString()) as bool;
+
+      //! 서버통신 에러일때
+      if (result == false) {
+        Get.snackbar(
+          '저장실패!',
+          '잠시후 다시 시도하세요!',
+          backgroundColor: Colors.white,
+        );
+        return;
+      }
+      Get.back();
+      Get.snackbar(
+        '저장완료!',
+        '글쓰기가 완료되었습니다!',
+        backgroundColor: Colors.white,
+      );
+      return;
+    } else {
+      Get.snackbar(
+        '저장실패!',
+        '내용을 입력해주세요!',
+        backgroundColor: Colors.white,
+      );
+      return;
+    }
+  }
 
   ExampleWritePage({Key? key}) : super(key: key);
   @override
@@ -45,35 +78,7 @@ class ExampleWritePage extends StatelessWidget {
               TextButton(
                 onPressed: () async {
                   //!TODO : validate 추가 물리백키 이슈 확인
-                  // if(formKey.currentState!.validate()){
-                  // validation 이 성공하면 true 가 리턴돼요!
-                  //! 함수화
-                  _formKey.currentState!.save();
-                  if (writeData.isNotEmpty) {
-                    //! model에 새로운거 어떻게 추가하는지???
-
-                    _exampleViewModel.setNoteBDoc(
-                        title: writeData['title'].toString(),
-                        content: writeData['content'].toString());
-                    // AddNoteB().addNoteBDoc(writeData: writeData);
-                    Get.back();
-
-                    Get.snackbar(
-                      '저장완료!',
-                      '폼 저장이 완료되었습니다!',
-                      backgroundColor: Colors.white,
-                    );
-                    return;
-                  } else {
-                    Get.snackbar(
-                      '저장실패!',
-                      '내용을 입력해주세요!',
-                      backgroundColor: Colors.white,
-                    );
-                    return;
-                  }
-
-                  // }
+                  fncSetNoteBDoc();
                 },
                 child: const Text(
                   '저장하기!',
@@ -83,37 +88,6 @@ class ExampleWritePage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class TextFeildWithTitleWidget extends StatelessWidget {
-  final String title;
-  final String label;
-  final FormFieldSetter onSaved;
-  final FormFieldValidator validator;
-
-  final TextEditingController textFieldController;
-  const TextFeildWithTitleWidget({
-    Key? key,
-    required this.title,
-    required this.textFieldController,
-    required this.label,
-    required this.onSaved,
-    required this.validator,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      children: [
-        Text(title),
-        TextFormField(
-          onSaved: onSaved,
-          validator: validator,
-          // controller: textFieldController,
-        )
-      ],
     );
   }
 }

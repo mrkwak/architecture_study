@@ -24,13 +24,37 @@ class _ExamplePageState extends State<ExamplePage> {
     super.initState();
   }
 
+  void fncGetExampleList() {
+    bool result = _exampleViewModel.getExampleList() as bool;
+    if (result == false) {
+      Get.snackbar(
+        '불러오기 실패!',
+        '잠시후 다시 시도하세요!',
+        backgroundColor: Colors.white,
+      );
+      return;
+    }
+  }
+
+  void fncGetExampleListByIsFavorited() {
+    bool result = _exampleViewModel.getExampleListByIsFavorited() as bool;
+    if (result == false) {
+      Get.snackbar(
+        '불러오기 실패!',
+        '잠시후 다시 시도하세요!',
+        backgroundColor: Colors.white,
+      );
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('메인화면'), actions: [
         IconButton(
             onPressed: () {
-              _exampleViewModel.getExampleListByIsFavorited();
+              fncGetExampleListByIsFavorited;
             },
             icon: const Icon(Icons.favorite))
       ]),
@@ -39,7 +63,7 @@ class _ExamplePageState extends State<ExamplePage> {
           Expanded(
             child: TextButton(
                 onPressed: () {
-                  _exampleViewModel.getExampleList();
+                  fncGetExampleList;
                 },
                 child: const Text("글 가져오기")),
           ),
@@ -69,7 +93,7 @@ class _ExamplePageState extends State<ExamplePage> {
           if (state is Error) {
             return TextButton(
                 onPressed: () {
-                  _exampleViewModel.getExampleList();
+                  fncGetExampleList;
                 },
                 child: const Text("Error Retry!"));
           }

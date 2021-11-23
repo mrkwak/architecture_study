@@ -3,6 +3,7 @@ import 'package:architecture_project/core/view_state.dart';
 import 'package:architecture_project/model/example_model.dart';
 import 'package:architecture_project/repository/example_repository.dart';
 import 'package:dartz/dartz.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
@@ -23,7 +24,7 @@ class ExampleViewModel extends GetxController {
     return exampleList.where((element) => element.isFavorited == true).toList();
   }
 
-  Future<void> getExampleList() async {
+  Future<bool> getExampleList() async {
     //서버 통신 시작 => Loading으로 화면 바꾸기
     _viewState.value = Loading();
 
@@ -42,7 +43,7 @@ class ExampleViewModel extends GetxController {
       // 그걸 담은 Error (ViewState를 상속받은)에 넣어서 셋팅
       _viewState.value = Error(result as Failure);
       //화면 error로 바꾸고 종료
-      return;
+      return false;
     }
 
     //혹시 모르니, 기존 데이터 지우고 새로운 데이터 입력
@@ -50,39 +51,50 @@ class ExampleViewModel extends GetxController {
     exampleList.addAll(result as List<ExampleModel>);
     //성공인 경우는 Loaded로 바꿔서 화면이 화면 제대로 그리도록 알려줌.
     _viewState.value = Loaded();
+    return true;
   }
 
-  Future<void> getExampleListByIsFavorited() async {
-    //서버 통신 시작 => Loading으로 화면 바꾸기
-    _viewState.value = Loading();
+  Future<bool> getExampleListByIsFavorited() async {
+    //! 새로고침
+    //exampleList Initial 이면 서버 통신
+    if (_viewState.value is Initial) {
+      _viewState.value = Loading();
+      //서버 통신 시작 => Loading으로 화면 바꾸기
 
-    Either<Failure, List<ExampleModel>> either =
-        await _repository.getExampleModelByIsFavorited();
+      Either<Failure, List<ExampleModel>> either =
+          await _repository.getExampleModelByIsFavorited();
 
-    //fold를 사용하면 right, left 결과에 따라 다른 내용이 호출
-    // 아래는 left(실패)일 경우 left결과값 그대로 반환
-    //  right(성공)일 경우 right 결과값 그대로 반환
-    var result = either.fold(
-        (Failure left) => left, (List<ExampleModel> right) => right);
+      //fold를 사용하면 right, left 결과에 따라 다른 내용이 호출
+      // 아래는 left(실패)일 경우 left결과값 그대로 반환
+      //  right(성공)일 경우 right 결과값 그대로 반환
+      var result = either.fold(
+          (Failure left) => left, (List<ExampleModel> right) => right);
 
-    if (either.isLeft()) {
-      //isLeft가 true이면 실패한 상태
-      //즉, result에는 left(Failure)가 들어가 있음
-      // 그걸 담은 Error (ViewState를 상속받은)에 넣어서 셋팅
-      _viewState.value = Error(result as Failure);
-      //화면 error로 바꾸고 종료
-      return;
+      if (either.isLeft()) {
+        //isLeft가 true이면 실패한 상태
+        //즉, result에는 left(Failure)가 들어가 있음
+        // 그걸 담은 Error (ViewState를 상속받은)에 넣어서 셋팅
+        _viewState.value = Error(result as Failure);
+        //화면 error로 바꾸고 종료
+        return false;
+      }
+
+      //혹시 모르니, 기존 데이터 지우고 새로운 데이터 입력
+      exampleList.clear();
+      exampleList.addAll(result as List<ExampleModel>);
+    } else {
+      exampleList.where((element) => element.isFavorited == true)
+          as List<ExampleModel>;
+      return true;
     }
 
-    //혹시 모르니, 기존 데이터 지우고 새로운 데이터 입력
-    exampleList.clear();
-    exampleList.addAll(result as List<ExampleModel>);
     //성공인 경우는 Loaded로 바꿔서 화면이 화면 제대로 그리도록 알려줌.
     _viewState.value = Loaded();
+    return true;
   }
 
   //2개의 화면에서 호출 가능
-  Future<void> toggleFavorite({required String docId}) async {
+  Future<bool> toggleFavorite({required String docId}) async {
     //1. 변경 할 모델 찾기
     ExampleModel model =
         exampleList.firstWhere((element) => element.id == docId);
@@ -96,15 +108,17 @@ class ExampleViewModel extends GetxController {
     if (either.isLeft()) {
       //!ERROR
       model.isFavorited = !model.isFavorited;
-      return;
+
+      return false;
     }
     //3. 해당 모델 찾아서 바꿔주기
 
     //3. 화면에 반영하기
     exampleList.refresh();
+    return true;
   }
 
-  Future<void> setNoteBDoc(
+  Future<bool> setNoteBDoc(
       {required String title, required String content}) async {
     //1. 변경 할 모델 찾기
     ExampleModel model = ExampleModel(
@@ -120,11 +134,12 @@ class ExampleViewModel extends GetxController {
 
     if (either.isLeft()) {
       //!ERROR
-      return;
+      return false;
     }
     //3. 해당 모델 찾아서 바꿔주기
 
     //3. 화면에 반영하기
     exampleList.refresh();
+    return true;
   }
 }

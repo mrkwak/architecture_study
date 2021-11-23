@@ -27,10 +27,29 @@ class _ExampleDetailPageState extends State<ExampleDetailPage> {
     super.initState();
   }
 
+  void fncToggleFavorite() async {
+    bool result =
+        _exampleViewModel.toggleFavorite(docId: model.id.toString()) as bool;
+    if (result == false) {
+      Get.snackbar(
+        '불러오기 실패!',
+        '잠시후 다시 시도하세요!',
+        backgroundColor: Colors.white,
+      );
+      return;
+    }
+    setState(() {
+      model.isFavorited = !model.isFavorited;
+    });
+    Get.snackbar(
+      '변경완료!',
+      '상태가 변경되었습니다.!',
+      backgroundColor: Colors.white,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    //! 어떻게 모델화?
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: Text(model.title)),
@@ -40,19 +59,10 @@ class _ExampleDetailPageState extends State<ExampleDetailPage> {
               Text(model.title),
               Text(model.content),
               IconButton(
-                onPressed: () async {
+                onPressed: () {
                   //! 실패시 어떻게 할지 추가
                   // fncToggleFavorite();
-                  await _exampleViewModel.toggleFavorite(
-                      docId: model.id.toString());
-                  setState(() {
-                    model.isFavorited = !model.isFavorited;
-                  });
-                  Get.snackbar(
-                    '변경완료!',
-                    '상태가 변경되었습니다.!',
-                    backgroundColor: Colors.white,
-                  );
+                  fncToggleFavorite;
                 },
                 icon: model.isFavorited
                     ? const Icon(Icons.favorite)
